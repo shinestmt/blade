@@ -36,7 +36,7 @@
     <body>
         
         
-    <div class="book" data-level="3.1" data-basepath=".." data-revision="Fri Jun 12 2015 22:14:00 GMT+0800 (中国标准时间)">
+    <div class="book" data-level="3.1" data-basepath=".." data-revision="Sun Jul 05 2015 13:45:37 GMT+0800 (中国标准时间)">
     
 
 <div class="book-summary">
@@ -244,9 +244,17 @@
             
         </li>
     
-        <li class="chapter " data-level="3.5" data-path="guide/sql2o.html">
+        <li class="chapter " data-level="3.5" data-path="guide/db.html">
             
-            <span><b>3.5.</b> 操作数据库</span>
+                
+                    <a href="../guide/db.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>3.5.</b>
+                        
+                        操作数据库
+                    </a>
+                
             
             
         </li>
@@ -271,10 +279,10 @@
             
         </li>
     
-        <li class="chapter " data-level="4" data-path="smaple/index.html">
+        <li class="chapter " data-level="4" data-path="smaple.html">
             
                 
-                    <a href="../smaple/index.html">
+                    <a href="../smaple.html">
                         <i class="fa fa-check"></i>
                         
                             <b>4.</b>
@@ -284,81 +292,30 @@
                 
             
             
-            <ul class="articles">
-                
+        </li>
     
-        <li class="chapter " data-level="4.1" data-path="smaple/blade-sample.html">
+        <li class="chapter " data-level="5" data-path="appendix1.html">
             
                 
-                    <a href="../smaple/blade-sample.html">
+                    <a href="../appendix1.html">
                         <i class="fa fa-check"></i>
                         
-                            <b>4.1.</b>
+                            <b>5.</b>
                         
-                        blade-sample
+                        附录一
                     </a>
                 
             
             
         </li>
     
-        <li class="chapter " data-level="4.2" data-path="smaple/blade-weixin.html">
-            
-                
-                    <a href="../smaple/blade-weixin.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>4.2.</b>
-                        
-                        blade-weixin
-                    </a>
-                
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="4.3" data-path="smaple/blade-postapi.html">
-            
-                
-                    <a href="../smaple/blade-postapi.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>4.3.</b>
-                        
-                        blade-postapi
-                    </a>
-                
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="4.4" data-path="smaple/blade-blog.html">
-            
-                
-                    <a href="../smaple/blade-blog.html">
-                        <i class="fa fa-check"></i>
-                        
-                            <b>4.4.</b>
-                        
-                        blade-blog
-                    </a>
-                
-            
-            
-        </li>
-    
-
-            </ul>
-            
-        </li>
-    
-        <li class="chapter " data-level="5" data-path="contribution.html">
+        <li class="chapter " data-level="6" data-path="contribution.html">
             
                 
                     <a href="../contribution.html">
                         <i class="fa fa-check"></i>
                         
-                            <b>5.</b>
+                            <b>6.</b>
                         
                         贡献代码
                     </a>
@@ -367,13 +324,13 @@
             
         </li>
     
-        <li class="chapter " data-level="6" data-path="contact-me.html">
+        <li class="chapter " data-level="7" data-path="contact-me.html">
             
                 
                     <a href="../contact-me.html">
                         <i class="fa fa-check"></i>
                         
-                            <b>6.</b>
+                            <b>7.</b>
                         
                         联系作者
                     </a>
@@ -526,6 +483,15 @@
 <p>(1) <em>&#x89E3;&#x8026;&#xFF0C;&#x5C06;&#x4F9D;&#x8D56;&#x4E4B;&#x95F4;&#x89E3;&#x8026;&#x3002;</em></p>
 <p>(2) <em>&#x56E0;&#x4E3A;&#x5DF2;&#x7ECF;&#x89E3;&#x8026;&#xFF0C;&#x6240;&#x4EE5;&#x65B9;&#x4FBF;&#x505A;&#x5355;&#x5143;&#x6D4B;&#x8BD5;&#xFF0C;&#x5C24;&#x5176;&#x662F; Mock &#x6D4B;&#x8BD5;&#x3002;</em></p>
 <h4 id="blade-%E4%B8%AD%E7%9A%84%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5">Blade &#x4E2D;&#x7684;&#x4F9D;&#x8D56;&#x6CE8;&#x5165;</h4>
+<ul>
+<li>&#x914D;&#x7F6E;&#x8981;&#x8FDB;&#x884C;&#x4F9D;&#x8D56;&#x6CE8;&#x5165;&#x7684;&#x5305;</li>
+<li>&#x5BF9;&#x8981;&#x7528;IOC&#x7BA1;&#x7406;&#x7684;&#x7C7B;&#x8FDB;&#x884C;&#x914D;&#x7F6E;</li>
+<li>&#x4F7F;&#x7528;<code>@Inject</code>&#x6CE8;&#x89E3;&#x8FDB;&#x884C;&#x6CE8;&#x5165;</li>
+</ul>
+<p>&#x914D;&#x7F6E;&#xFF1A;</p>
+<pre><code class="lang-java"><span class="hljs-comment">// &#x914D;&#x7F6E;IOC&#x5BB9;&#x5668;&#x8981;&#x7BA1;&#x7406;&#x7684;&#x5305;</span>
+Blade.ioc(<span class="hljs-string">&quot;blade.sample.service.*&quot;</span>);
+</code></pre>
 <p>&#x4F9D;&#x8D56;&#x6CE8;&#x5165;&#x7684;&#x5B9E;&#x73B0;&#x6709;&#x591A;&#x79CD;&#x9014;&#x5F84;&#xFF0C;&#x800C;&#x5728; Java &#x4E2D;&#xFF0C;&#x4F7F;&#x7528;&#x6CE8;&#x89E3;&#x662F;&#x6700;&#x5E38;&#x7528;&#x7684;&#x3002;</p>
 <p>&#x901A;&#x8FC7;&#x5728;&#x5B57;&#x6BB5;&#x7684;&#x58F0;&#x660E;&#x524D;&#x6DFB;&#x52A0; @Inject &#x6CE8;&#x89E3;&#x8FDB;&#x884C;&#x6807;&#x8BB0;&#xFF0C;&#x6765;&#x5B9E;&#x73B0;&#x4F9D;&#x8D56;&#x5BF9;&#x8C61;&#x7684;&#x81EA;&#x52A8;&#x6CE8;&#x5165;&#x3002;</p>
 <pre><code class="lang-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Hello</span> </span>{
@@ -592,7 +558,6 @@
 <p>&#x5B83;&#x5E94;&#x8BE5;&#x662F;&#x8FD9;&#x6837;&#x7684;&#xFF0C;&#x540C;&#x6837;&#x4F60;&#x5B9A;&#x4E49;&#x4E00;&#x4E2A;<code>UserService</code>&#x7684;&#x63A5;&#x53E3;&#xFF0C;</p>
 <p>&#x5728;&#x5B83;&#x7684;&#x5B9E;&#x73B0;&#x7C7B;&#x4E0A;&#x6807;&#x6CE8;&#x4E00;&#x4E2A;<code>@Component</code>&#x6CE8;&#x89E3;&#x5C31;&#x4EE3;&#x8868;&#x8BE5;&#x63A5;&#x53E3;&#x7684;&#x5B9E;&#x4F8B;&#x5BF9;&#x8C61;&#x662F;UserServiceImpl&#xFF0C;</p>
 <p>&#x4F60;&#x8981;&#x786E;&#x4FDD;&#x4E00;&#x4E2A;&#x63A5;&#x53E3;&#x6CA1;&#x6709;&#x591A;&#x4E2A;&#x5B9E;&#x73B0;&#x7C7B;&#x6216;&#x4E00;&#x4E2A;&#x63A5;&#x53E3;&#x53EA;&#x80FD;&#x6CE8;&#x5165;&#x4E00;&#x4E2A;&#x5B9E;&#x73B0;&#x7C7B;&#xFF0C;&#x5426;&#x5219;&#x65E0;&#x6CD5;&#x6210;&#x529F;&#x6CE8;&#x5165;&#x3002;</p>
-<p><a href="#">Blade Ioc &#x7684;&#x4F8B;&#x5B50;</a></p>
 <p>&#x66F4;&#x591A;&#x5173;&#x4E8E;&#x4F9D;&#x8D56;&#x6CE8;&#x5165;&#x7684;&#x8D44;&#x6599;&#xFF1A;</p>
 <p><a href="http://www.cnblogs.com/xingyukun/archive/2007/10/20/931331.html" target="_blank">&#x6DF1;&#x5EA6;&#x7406;&#x89E3;&#x4F9D;&#x8D56;&#x6CE8;&#x5165;&#xFF08;Dependence Injection&#xFF09;</a></p>
 <p><a href="http://objccn.io/issue-11-6/" target="_blank">&#x4F9D;&#x8D56;&#x6CE8;&#x5165;&#x548C;&#x6CE8;&#x89E3;&#xFF0C;&#x4E3A;&#x4EC0;&#x4E48; Java &#x6BD4;&#x4F60;&#x60F3;&#x8C61;&#x7684;&#x8981;&#x597D;</a></p>
