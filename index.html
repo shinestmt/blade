@@ -32,49 +32,40 @@
 
         <section id="main_content">
           <h1>
-<a id="blade-web-framework" class="anchor" href="#blade-web-framework" aria-hidden="true"><span class="octicon octicon-link"></span></a>Blade Web Framework</h1>
+<a id="blade" class="anchor" href="#blade" aria-hidden="true"><span class="octicon octicon-link"></span></a>Blade</h1>
 
-<p>新一代<code>javaweb</code>开发引擎</p>
+<p><img src="http://i1.tietuku.com/0c4b9726253b6268.png" alt="简洁强大的JavaWeb框架"></p>
+
+<p><a href="https://github.com/biezhi/blade/blob/master/README_EN.md">English</a></p>
+
+<p><a href="http://weibo.com/u/5238733773"><img src="https://img.shields.io/badge/weibo-%40biezhi-red.svg" alt="@biezhi on weibo"></a>
+<a href="http://www.apache.org/licenses/LICENSE-2.0.html"><img src="https://img.shields.io/hexpm/l/plug.svg" alt="Hex.pm"></a>
+<a href="https://travis-ci.org/biezhi/blade"><img src="https://api.travis-ci.org/biezhi/blade.svg?branch=master" alt="Build Status"></a>
+<a href="https://circleci.com/gh/biezhi/blade/tree/master"><img src="https://circleci.com/gh/biezhi/blade/tree/master.svg?style=svg" alt="Circle CI"></a>
+<a href="http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.bladejava%22"><img src="https://img.shields.io/maven-central/v/com.bladejava/blade.svg" alt="release"></a></p>
+
+<p><strong>blade</strong> 是一个简洁强大的web框架，它内置了<code>IOC</code>管理，拦截器配置，<code>REST API</code>开发等众多主流web特性，集成了模板引擎，缓存插件，数据库操作，邮件发送等常用功能，简洁的源码值得你阅读和学习。如果你喜欢，欢迎<code>Star and Fork</code> ！</p>
 
 <h2>
-<a id="目录" class="anchor" href="#%E7%9B%AE%E5%BD%95" aria-hidden="true"><span class="octicon octicon-link"></span></a>目录</h2>
+<a id="blade特性" class="anchor" href="#blade%E7%89%B9%E6%80%A7" aria-hidden="true"><span class="octicon octicon-link"></span></a>Blade特性</h2>
 
 <ul>
-<li>  <a href="#features">特性</a>
-</li>
-<li>  <a href="#%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B">快速上手</a>
-</li>
-<li>  <a href="#%E6%A1%86%E6%9E%B6%E8%AF%AD%E6%B3%95">框架语法</a>
-</li>
-<li>  <a href="#%E4%B8%8B%E8%BD%BD">下载</a>
-</li>
-<li>  <a href="#doc">文档</a>
-</li>
-<li>  <a href="#%E6%8E%88%E6%9D%83%E5%8D%8F%E8%AE%AE">授权协议</a>
-</li>
-<li>  <a href="#%E8%81%94%E7%B3%BB%E6%88%91">联系我</a>
-</li>
-</ul>
-
-<h2>
-<a id="特性" class="anchor" href="#%E7%89%B9%E6%80%A7" aria-hidden="true"><span class="octicon octicon-link"></span></a>特性</h2>
-
-<ol>
-<li>性能卓越，更简洁的MVC设计</li>
-<li>REST风格API路由</li>
-<li>注解拦截器</li>
+<li>简洁的MVC &amp; 拦截器</li>
+<li>REST风格API</li>
+<li>注解方式开发</li>
 <li>微内核IOC容器</li>
 <li>实用工具类</li>
 <li>模板引擎支持</li>
 <li>支持JDK1.6+</li>
 <li>内置Jetty启动</li>
 <li>插件扩展机制</li>
-</ol>
+<li>...</li>
+</ul>
 
 <h2>
-<a id="快速上手" class="anchor" href="#%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B" aria-hidden="true"><span class="octicon octicon-link"></span></a>快速上手</h2>
+<a id="快速入门" class="anchor" href="#%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8" aria-hidden="true"><span class="octicon octicon-link"></span></a>快速入门</h2>
 
-<p>第一步、用maven构建一个webapp，加入blade的依赖</p>
+<p>第一步、用maven构建一个webapp，加入blade的依赖，推荐获取<a href="http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.bladejava%22">最新版本</a></p>
 
 <div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
     &lt;<span class="pl-ent">groupId</span>&gt;com.bladejava&lt;/<span class="pl-ent">groupId</span>&gt;
@@ -82,7 +73,7 @@
     &lt;<span class="pl-ent">version</span>&gt;x.x.x&lt;/<span class="pl-ent">version</span>&gt;
 &lt;/<span class="pl-ent">dependency</span>&gt;</pre></div>
 
-<p>第二步、在<code>web.xml</code>中配置Blade核心过滤器并设置你的初始化类</p>
+<p>第二步、在<code>web.xml</code>中配置Blade核心过滤器并设置你的初始化类，你也可以不配置(使用jetty启动)</p>
 
 <div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">web-app</span>&gt;
     &lt;<span class="pl-ent">display-name</span>&gt;Archetype Created Web Application&lt;/<span class="pl-ent">display-name</span>&gt;
@@ -107,10 +98,8 @@
 <div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">App</span> <span class="pl-k">extends</span> <span class="pl-e">BladeApplication</span>{
 
     <span class="pl-smi">Logger</span> logger <span class="pl-k">=</span> <span class="pl-smi">Logger</span><span class="pl-k">.</span>getLogger(<span class="pl-smi">App</span><span class="pl-k">.</span>class);
-
     <span class="pl-k">@Override</span>
     <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">init</span>() {
-
         <span class="pl-c">// 设置路由、拦截器包所在包</span>
         <span class="pl-smi">Blade</span><span class="pl-k">.</span>defaultRoute(<span class="pl-s"><span class="pl-pds">"</span>blade.sample<span class="pl-pds">"</span></span>);
     }
@@ -150,28 +139,60 @@
 
 }</pre></div>
 
-<h2>
-<a id="下载" class="anchor" href="#%E4%B8%8B%E8%BD%BD" aria-hidden="true"><span class="octicon octicon-link"></span></a>下载</h2>
+<p>OK，这一切看起来多么的简单，查阅使用指南更多现成的例子供你参考:</p>
 
-<p><a href="http://search.maven.org/remotecontent?filepath=com/bladejava/blade/1.1.1/blade-1.1.1.jar">blade-1.1.1.jar</a>
-<a href="http://search.maven.org/remotecontent?filepath=com/bladejava/blade-kit/1.1.1/blade-kit-1.1.1.jar">blade-kit-1.1.1.jar</a></p>
+<p><a href="http://#">Blade使用指南</a> (正在完善中...)</p>
 
-<h2>
-<a id="文档" class="anchor" href="#%E6%96%87%E6%A1%A3" aria-hidden="true"><span class="octicon octicon-link"></span></a>文档</h2>
-
-<p>中文指南：<a href="http://bladejava.com/doc/cn">http://bladejava.com/doc/cn</a>
-Java Doc：<a href="http://bladejava.com/doc/api">http://bladejava.com/doc/api</a></p>
+<p>一些例子：<a href="https://github.com/bladejava">https://github.com/bladejava</a></p>
 
 <h2>
-<a id="授权协议" class="anchor" href="#%E6%8E%88%E6%9D%83%E5%8D%8F%E8%AE%AE" aria-hidden="true"><span class="octicon octicon-link"></span></a>授权协议</h2>
+<a id="更新日志" class="anchor" href="#%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97" aria-hidden="true"><span class="octicon octicon-link"></span></a>更新日志</h2>
 
-<p><a href="https://github.com/biezhi/blade/blob/master/license.txt">Apache2 License</a></p>
+<h3>
+<a id="v112" class="anchor" href="#v112" aria-hidden="true"><span class="octicon octicon-link"></span></a>v1.1.2</h3>
+
+<pre><code>1. 优化sql2o支持
+2. 去除blade-kit无用类
+3. 添加邮件支持
+4. 添加程序计时支持
+5. 添加http网络请求支持
+</code></pre>
+
+<h3>
+<a id="v110" class="anchor" href="#v110" aria-hidden="true"><span class="octicon octicon-link"></span></a>v1.1.0</h3>
+
+<pre><code>1. 去除对外公开的多余方法展示
+2. 添加`Blade.run()`方式运行jetty
+3. 添加`Blade.register()`方法注册bean对象
+4. 优化IOC对象管理
+5. 优化底层IO
+6. 简化插件扩展
+7. 拦截器路由匹配分离
+8. 修复jetty在多maven环境下运行bug 
+9. 添加初始化监听context
+10. 优化文件上传
+11. 优化路由匹配
+12. 添加方法执行监测
+13. 添加缓存支持
+</code></pre>
+
+<h3>
+<a id="v100" class="anchor" href="#v100" aria-hidden="true"><span class="octicon octicon-link"></span></a>v1.0.0</h3>
+
+<pre><code>第一个稳定版本发布
+</code></pre>
+
+<h2>
+<a id="开源协议" class="anchor" href="#%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE" aria-hidden="true"><span class="octicon octicon-link"></span></a>开源协议</h2>
+
+<p>Blade框架基于 <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache2 License</a></p>
 
 <h2>
 <a id="联系我" class="anchor" href="#%E8%81%94%E7%B3%BB%E6%88%91" aria-hidden="true"><span class="octicon octicon-link"></span></a>联系我</h2>
 
-<p>mail：<a href="mailto:biezhi.me@gmail.com">biezhi.me@gmail.com</a>
-qq群：<a href="http://shang.qq.com/wpa/qunwpa?idkey=932642920a5c0ef5f1ae902723c4f168c58ea63f3cef1139e30d68145d3b5b2f">1013565</a></p>
+<p>Mail: biezhi.me#gmail.com</p>
+
+<p>Java交流群: <a href="http://shang.qq.com/wpa/qunwpa?idkey=932642920a5c0ef5f1ae902723c4f168c58ea63f3cef1139e30d68145d3b5b2f">1013565</a></p>
         </section>
 
         <footer>
