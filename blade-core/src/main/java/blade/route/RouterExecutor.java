@@ -13,42 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package blade.annotation;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package blade.route;
 
 /**
- * 拦截器后置事件注解，写在方法上  
- * 如：
- * <pre>
- *  @After("")
- *	public void after(Request request){...}
- * </pre>
- * 
+ * 多个路由的执行器
+ *
  * @author	<a href="mailto:biezhi.me@gmail.com" target="_blank">biezhi</a>
  * @since	1.0
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface After {
+public class RouterExecutor{
 	
-	/**
-	 * 后置事件要拦截的URL
-	 */
-	String value() default "";
+	private String[] paths;
 	
-	/**
-	 * 路由后缀
-	 * @return String 
-	 */
-	String suffix() default "";
+	private HttpMethod httpMethod;
 	
-	/**
-	 * 多个前置拦截
-	 * @return
-	 */
-	String[] values() default {};
+	public RouterExecutor(String[] paths, HttpMethod httpMethod) {
+		this.paths = paths;
+		this.httpMethod = httpMethod;
+	}
+	
+	public void run(Router router) {
+		// 拦截器
+		if(this.httpMethod == HttpMethod.BEFORE || this.httpMethod == HttpMethod.AFTER){
+			for(String path : paths){
+				RouteMatcherBuilder.buildInterceptor(path, router, httpMethod);
+			}
+		} else {
+			// 路由
+			for(String path : paths){
+				RouteMatcherBuilder.buildHandler(path, router, httpMethod);
+			}
+		}
+	}
+	
 }

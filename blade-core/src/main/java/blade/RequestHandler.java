@@ -52,8 +52,6 @@ public class RequestHandler {
 	
 	private static final Logger LOGGER = Logger.getLogger(RequestHandler.class);
 	
-	private static final String ACCEPT_TYPE_REQUEST_MIME_HEADER = "Accept";
-	
     /**
      * 服务器500错误时返回的HTML
      */
@@ -61,29 +59,19 @@ public class RequestHandler {
 	private static final String INTERNAL_ERROR = "<html><head><title>500 Internal Error</title></head><body bgcolor=\"white\"><center><h1>500 Internal Error</h1></center><hr><center>blade "
 			+ Blade.VERSION +"</center></body></html>";
     
+	/**
+	 * IOC容器
+	 */
     private final static Container container = DefaultContainer.single();
     
     /**
      * 路由处理器，查找请求过来的URL
      */
-    private static DefaultRouteMatcher defaultRouteMatcher = DefaultRouteMatcher.instance();
+    private static final DefaultRouteMatcher DEFAULT_ROUTE_MATCHER = DefaultRouteMatcher.instance();
     
-	private RequestHandler(){}
-	
-	public static RequestHandler single() {
-        return RequestHandlerHolder.single;
-    }
-	
-	/**
-	 * 单例的RequestHandler
-	 * 
-	 * @author biezhi
-	 * @since 1.0
-	 *
-	 */
-	private static class RequestHandlerHolder {
-        private static final RequestHandler single = new RequestHandler();
-    }
+	public RequestHandler(){
+		
+	}
 	
 	/**
 	 * handler执行方法
@@ -106,15 +94,14 @@ public class RequestHandler {
         		return false;
         	}
         }
-        String acceptType = httpRequest.getHeader(ACCEPT_TYPE_REQUEST_MIME_HEADER);
-        
-        // 创建RequestWrapper And RequestWrapper
-        RequestWrapper requestWrapper = new RequestWrapper();
-        ResponseWrapper responseWrapper = new ResponseWrapper();
         
         if(Blade.debug()){
         	LOGGER.debug("Request : " + method + "\t" + uri);
         }
+        
+        // 创建RequestWrapper And RequestWrapper
+        RequestWrapper requestWrapper = new RequestWrapper();
+        ResponseWrapper responseWrapper = new ResponseWrapper();
         
         // 构建一个包装后的response
         Response response = RequestResponseBuilder.build(httpResponse);
@@ -125,11 +112,11 @@ public class RequestHandler {
         	responseWrapper.setDelegate(response);
         	
         	// 查找用户请求的uri
-			RouteMatcher match = defaultRouteMatcher.findRouteMatcher(httpMethod, uri, acceptType);
+			RouteMatcher match = DEFAULT_ROUTE_MATCHER.findRoute(httpMethod, uri);
 			// 如果找到
 			if (match != null) {
 				// 执行before拦截
-				result = before(httpRequest, requestWrapper, responseWrapper,  uri, acceptType);
+				result = intercept(httpRequest, requestWrapper, responseWrapper, uri, HttpMethod.BEFORE);
 				if(result instanceof Boolean){
 					boolean isHandler = (Boolean) result;
 					if(!isHandler){
@@ -158,8 +145,8 @@ public class RequestHandler {
 				
 				// 执行after拦截
 				responseWrapper.setDelegate(response);
-	        	after(httpRequest, requestWrapper, responseWrapper, uri, acceptType);
-	        	
+				intercept(httpRequest, requestWrapper, responseWrapper, uri, HttpMethod.AFTER);
+				
 				if (null != result)
 					render(responseWrapper, result);
 				return true;
@@ -210,7 +197,7 @@ public class RequestHandler {
         }
 		
 		// 初始化context
-		BladeWebContext.init(requestWrapper, responseWrapper);
+		BladeWebContext.setContext(httpRequest.getServletContext(), httpRequest, responseWrapper.servletResponse(), requestWrapper, responseWrapper);
 					
 		if(null != router){
 			
@@ -232,53 +219,25 @@ public class RequestHandler {
 	}
 	
 	/**
-	 * 前置事件，在route执行前执行
-	 * 这里如果执行则Request和Response都会被创建好
+	 * 拦截器事件
 	 * 
+	 * @param httpRequest			HttpServletRequest请求对象，用于构建Request
 	 * @param requestWrapper		RequestWrapper对象，包装了Request对象
 	 * @param responseWrapper		ResponseWrapper对象，包装了Response对象
-	 * @param httpRequest			HttpServletRequest请求对象，用于构建Request
 	 * @param uri					请求的URI
-	 * @param acceptType			请求头过滤
 	 */
-	private Object before(HttpServletRequest httpRequest, RequestWrapper requestWrapper, ResponseWrapper responseWrapper, final String uri, final String acceptType){
-		
-		List<RouteMatcher> matchSet = defaultRouteMatcher.findInterceptor(HttpMethod.BEFORE, uri, acceptType);
-		
-		for (RouteMatcher filterMatch : matchSet) {
+	private Object intercept(HttpServletRequest httpRequest, RequestWrapper requestWrapper, 
+			ResponseWrapper responseWrapper, String uri, HttpMethod httpMethod){
+        List<RouteMatcher> matchSet = DEFAULT_ROUTE_MATCHER.findInterceptor(httpMethod, uri);
+        
+        for (RouteMatcher filterMatch : matchSet) {
 			Object object = realHandler(httpRequest, requestWrapper, responseWrapper, filterMatch);
 			if(null != object){
 				return object;
 			}
         }
 		
-		return true;
-	}
-	
-	/**
-	 * 后置事件，在route执行后执行
-	 * 
-	 * @param httpRequest			HttpServletRequest请求对象，用于构建Request
-	 * @param requestWrapper		RequestWrapper对象，包装了Request对象
-	 * @param responseWrapper		ResponseWrapper对象，包装了Response对象
-	 * @param uri					请求的URI
-	 * @param acceptType			请求头过滤
-	 */
-	private boolean after(HttpServletRequest httpRequest, RequestWrapper requestWrapper, ResponseWrapper responseWrapper, final String uri, final String acceptType){
-        List<RouteMatcher> matchSet = defaultRouteMatcher.findInterceptor(HttpMethod.AFTER, uri, acceptType);
-        
-        boolean isHandler = true;
-        
-        for (RouteMatcher filterMatch : matchSet) {
-        	Object object = realHandler(httpRequest, requestWrapper, responseWrapper, filterMatch);
-			if(null != object && object instanceof Boolean){
-				isHandler = (Boolean) object;
-				if(!isHandler){
-					return false;
-				}
-			}
-        }
-        return isHandler;
+        return true;
 	}
 	
 	/**
@@ -317,6 +276,7 @@ public class RequestHandler {
 	 */
 	private Object executeMethod(Object object, Method method, RequestWrapper requestWrapper, ResponseWrapper responseWrapper){
 		int len = method.getParameterTypes().length;
+		method.setAccessible(true);
 		if(len > 0){
 			Object[] args = getArgs(requestWrapper, responseWrapper, method.getParameterTypes());
 			return ReflectKit.invokeMehod(object, method, args);
@@ -340,6 +300,11 @@ public class RequestHandler {
 		}
 	}
 	
+	/**
+	 * 要过滤掉的目录
+	 * @param uri
+	 * @return
+	 */
 	private boolean filterStaticFolder(String uri){
 		int len = Blade.staticFolder().length;
     	for(int i=0; i<len; i++){

@@ -26,6 +26,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import blade.kit.TaskKit;
 import blade.kit.log.Logger;
 import blade.route.RouteMatcherBuilder;
 
@@ -43,7 +44,7 @@ public class BladeFilter implements Filter {
 	/**
 	 * blade全局初始化类
 	 */
-    private static final String APPLCATION_CLASS = "applicationClass";
+    private static final String BOOSTRAP_CLASS = "bootstrapClass";
     
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -54,9 +55,7 @@ public class BladeFilter implements Filter {
 				
 				Blade.webRoot(filterConfig.getServletContext().getRealPath("/"));
 				
-				BladeWebContext.servletContext(filterConfig.getServletContext());
-				
-				final Bootstrap bootstrap = getBootstrap(filterConfig.getInitParameter(APPLCATION_CLASS));
+				final Bootstrap bootstrap = getBootstrap(filterConfig.getInitParameter(BOOSTRAP_CLASS));
 				bootstrap.init();
 			    Blade.app(bootstrap);
 			    
@@ -65,7 +64,7 @@ public class BladeFilter implements Filter {
 			    
 			    IocApplication.init();
 			    
-			    bootstrap.contextInitialized(BladeWebContext.servletContext());
+			    bootstrap.contextInitialized();
 			    
 			    Blade.init();
 			    
@@ -114,7 +113,7 @@ public class BladeFilter implements Filter {
         /**
          * 是否被RequestHandler执行
          */
-        boolean isHandler = RequestHandler.single().handler(httpRequest, httpResponse);
+        boolean isHandler = new RequestHandler().handler(httpRequest, httpResponse);
         if(!isHandler){
         	chain.doFilter(httpRequest, httpResponse);
         }
@@ -122,8 +121,10 @@ public class BladeFilter implements Filter {
 	
     @Override
     public void destroy() {
-    	IocApplication.destroy();
     	LOGGER.info("blade destroy!");
+    	BladeWebContext.remove();
+    	IocApplication.destroy();
+    	TaskKit.depose();
     }
 
 }

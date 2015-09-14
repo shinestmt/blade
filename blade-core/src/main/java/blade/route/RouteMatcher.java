@@ -49,37 +49,27 @@ public class RouteMatcher {
     HttpMethod httpMethod;
     
     /**
-     * 路由path
-     */
-    String path;
-    
-    /**
      * 请求URI
      */
     String requestURI;
     
     /**
-     * 允许的acceptType
+     * 路由path
      */
-    String acceptType;
+    String path;
     
     public RouteMatcher() {
     }
     
-    public RouteMatcher(Router router, Class<?> target, Method execMethod, HttpMethod httpMethod, String path, String requestUri, String acceptType) {
+    public RouteMatcher(Router router, Class<?> target, Method execMethod, HttpMethod httpMethod, String path, String requestUri) {
         this.router = router;
         this.target = target;
         this.execMethod = execMethod;
         this.httpMethod = httpMethod;
         this.path = path;
         this.requestURI = requestUri;
-        this.acceptType = acceptType;
     }
-
-    public String getAcceptType() {
-        return acceptType;
-    }
-
+    
     public HttpMethod getHttpMethod() {
         return httpMethod;
     }
@@ -92,10 +82,6 @@ public class RouteMatcher {
 		return path;
 	}
     
-	public String getRequestURI() {
-        return requestURI;
-    }
-	
     public Class<?> getTarget() {
 		return target;
 	}
@@ -201,18 +187,58 @@ public class RouteMatcher {
     }
     
     @Override
-    public boolean equals(Object obj) {
-    	if(obj instanceof RouteMatcher){
-    		RouteMatcher r = (RouteMatcher) obj;
-    		return this.httpMethod == r.httpMethod && this.execMethod.getName().equals(r.execMethod.getName()) 
-    				&& this.path.equals(r.path) && this.acceptType.equals(r.acceptType);
-    	}
-    	return false;
-    }
-    
-    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((execMethod == null) ? 0 : execMethod.hashCode());
+		result = prime * result + ((httpMethod == null) ? 0 : httpMethod.hashCode());
+		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		result = prime * result + ((router == null) ? 0 : router.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RouteMatcher other = (RouteMatcher) obj;
+		if (execMethod == null) {
+			if (other.execMethod != null)
+				return false;
+		} else if (!execMethod.equals(other.execMethod))
+			return false;
+		if (httpMethod != other.httpMethod)
+			return false;
+		if (path == null) {
+			if (other.path != null)
+				return false;
+		} else if (!path.equals(other.path))
+			return false;
+		if (router == null) {
+			if (other.router != null)
+				return false;
+		} else if (!router.equals(other.router))
+			return false;
+		if (target == null) {
+			if (other.target != null)
+				return false;
+		} else if (!target.equals(other.target))
+			return false;
+		return true;
+	}
+	
+	@Override
     public String toString() {
         return httpMethod.name() + ":" + path;
     }
+
+	public String getRequestURI() {
+		return requestURI;
+	}
 	
 }

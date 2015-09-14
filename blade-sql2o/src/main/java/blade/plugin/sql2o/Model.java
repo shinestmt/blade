@@ -11,10 +11,12 @@ import org.sql2o.Connection;
 import org.sql2o.Query;
 import org.sql2o.Sql2o;
 
+import blade.Blade;
 import blade.kit.EncrypKit;
 import blade.kit.StringKit;
 import blade.kit.log.Logger;
 import blade.plugin.sql2o.Condition.DmlType;
+import blade.plugin.sql2o.cache.CacheType;
 import blade.plugin.sql2o.cache.Sql2oCache;
 import blade.plugin.sql2o.cache.Sql2oCacheFactory;
 import blade.plugin.sql2o.ds.DataSourceManager;
@@ -30,19 +32,16 @@ public class Model<T extends Serializable> {
 	private static final Logger LOGGER = Logger.getLogger(Model.class);
 	
 	/**
-	 * 是否开启缓存
+	 * 缓存对象
 	 */
-	private boolean isOpenCache = Sql2oPlugin.INSTANCE.isOpenCache();
-	
-	/**
-	 * 缓存操作
-	 */
-    public Sql2oCache sql2oCache = isOpenCache ? Sql2oCacheFactory.getSql2oCache() : null;
+    public Sql2oCache sql2oCache = Sql2oCacheFactory.getSql2oCache();
     
     /**
      * sql2o对象，操作数据库
      */
-    private Sql2o sql2o = DataSourceManager.getSql2o();
+    private Sql2o sql2o = DataSourceManager.me().getSql2o();
+    
+    private static final Sql2oPlugin SQL2O_PLUGIN = Blade.plugin(Sql2oPlugin.class);
     
     /**
      * 当前class实例
@@ -67,14 +66,18 @@ public class Model<T extends Serializable> {
     private String CACHE_KEY_LIST;
 	private String CACHE_KEY_COUNT;
 	private String CACHE_KEY_DETAIL;
+	// 自定义sql
+	private String CACHE_KEY_SQL_LIST;
+	private String CACHE_KEY_SQL_COUNT;
+	private String CACHE_KEY_SQL_DETAIL;
 	
 	public Model(Class<T> clazz) {
 		this.model = clazz;
 		this.condition = new Condition(table(), pk());
 		
-		CACHE_KEY_LIST = model.getName() + ":list";
-		CACHE_KEY_COUNT = model.getName() + ":count";
-		CACHE_KEY_DETAIL = model.getName() + ":detail";
+		CACHE_KEY_LIST = model.getName() + ":" + CacheType.list.toString();
+		CACHE_KEY_COUNT = model.getName() + ":" + CacheType.count.toString();
+		CACHE_KEY_DETAIL = model.getName() + ":" + CacheType.detail.toString();
 	}
 	
     public Sql2o getSql2o(){
@@ -102,7 +105,7 @@ public class Model<T extends Serializable> {
     	if(this.queryIsOpen){
     		return true;
     	}
-    	return isOpenCache && model.getAnnotation(Table.class).isCache() && this.cache;
+    	return SQL2O_PLUGIN.isOpenCache() && model.getAnnotation(Table.class).isCache() && this.cache;
     }
     
     /**
@@ -125,7 +128,10 @@ public class Model<T extends Serializable> {
      */
     private void init(){
     	this.queryIsOpen = false;
-    	this.cache = isOpenCache;
+    	this.cache = SQL2O_PLUGIN.isOpenCache();
+    	if(null == this.sql2o){
+    		this.sql2o = DataSourceManager.me().getSql2o();
+    	}
     }
     
     /**
@@ -138,7 +144,7 @@ public class Model<T extends Serializable> {
     }
     
     public boolean isOpenCache() {
-		return isOpenCache;
+		return SQL2O_PLUGIN.isOpenCache();
 	}
 
 	/**
@@ -149,6 +155,8 @@ public class Model<T extends Serializable> {
      */
     public Model<T> select(String sql){
     	init();
+    	CACHE_KEY_SQL_LIST = model.getName() + ":" + CacheType.sqllist.toString();
+    	CACHE_KEY_SQL_DETAIL = model.getName() + ":" + CacheType.sqldetail.toString();
     	condition.select(sql);
     	return this;
     }
@@ -170,6 +178,7 @@ public class Model<T extends Serializable> {
      */
     public Model<T> count(String sql){
     	init();
+    	CACHE_KEY_SQL_COUNT = model.getName() + ":" + CacheType.sqlcount.toString();
     	condition.count(sql);
     	return this;
     }
@@ -178,6 +187,7 @@ public class Model<T extends Serializable> {
      * @return	返回更新model对象，推荐方式
      */
     public Model<T> update(){
+    	init();
     	condition.update();
     	return this;
     }
@@ -189,6 +199,7 @@ public class Model<T extends Serializable> {
      * @return		返回更新model对象
      */
     public Model<T> update(String sql){
+    	init();
     	condition.update(sql);
     	return this;
     }
@@ -197,6 +208,7 @@ public class Model<T extends Serializable> {
      * @return	返回插入model对象，推荐方式
      */
     public Model<T> insert(){
+    	init();
     	condition.insert();
     	return this;
     }
@@ -207,6 +219,7 @@ public class Model<T extends Serializable> {
      * @return		返回插入model对象
      */
     public Model<T> insert(String sql){
+    	init();
     	condition.insert(sql);
     	return this;
     }
@@ -215,6 +228,7 @@ public class Model<T extends Serializable> {
      * @return	返回删除model对象
      */
     public Model<T> delete(){
+    	init();
     	condition.delete();
     	return this;
     }
@@ -226,6 +240,7 @@ public class Model<T extends Serializable> {
      * @return		返回自定义删除model对象
      */
     public Model<T> delete(String sql){
+    	init();
     	condition.delete(sql);
     	return this;
     }
@@ -534,7 +549,7 @@ public class Model<T extends Serializable> {
 				}
 				return count;
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -557,7 +572,8 @@ public class Model<T extends Serializable> {
     			
     			String cacheSql = getCacheCountKey();
     			field = EncrypKit.md5(cacheSql);
-    			count = sql2oCache.hgetV(CACHE_KEY_COUNT, field);
+    			String key = (null == CACHE_KEY_COUNT) ? CACHE_KEY_SQL_COUNT : CACHE_KEY_COUNT;
+    			count = sql2oCache.hgetV(key, field);
     			if(null != count){
     				return count;
     			}
@@ -583,10 +599,11 @@ public class Model<T extends Serializable> {
 				count = query.executeScalar(Long.class);
 				// 是否开启缓存查询
 				if(isCache()){
-					sql2oCache.hsetV(CACHE_KEY_COUNT, field, count);
+					String key = (null == CACHE_KEY_COUNT) ? CACHE_KEY_SQL_COUNT : CACHE_KEY_COUNT;
+					sql2oCache.hsetV(key, field, count);
 				}
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -612,8 +629,8 @@ public class Model<T extends Serializable> {
     		// 是否开启缓存查询
     		if(isCache()){
     			field = EncrypKit.md5(getCacheKey(null));
-    			
-    			res = sql2oCache.hget(CACHE_KEY_DETAIL, field);
+    			String key = (null == CACHE_KEY_SQL_DETAIL) ? CACHE_KEY_DETAIL : CACHE_KEY_SQL_DETAIL;
+    			res = sql2oCache.hget(key, field);
     			if(null != res){
     				return res;
     			}
@@ -632,11 +649,12 @@ public class Model<T extends Serializable> {
 				
 				// 重新放入缓存
 				if(isCache() && null != res){
-					sql2oCache.hset(CACHE_KEY_DETAIL, field, res);
+					String key = (null == CACHE_KEY_SQL_DETAIL) ? CACHE_KEY_DETAIL : CACHE_KEY_SQL_DETAIL;
+					sql2oCache.hset(key, field, res);
 				}
 				return res;
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -646,6 +664,69 @@ public class Model<T extends Serializable> {
     	return null;
     }
     
+	/**
+	 * 刷新缓存
+	 */
+	public void cleanCache(CacheType cacheType){
+		if(null != cacheType){
+			String key = model.getName() + ":" + cacheType;
+			sql2oCache.hdel(key);
+		}
+	}
+	
+	/**
+	 * 刷新缓存
+	 */
+	public void cleanCache(CacheType cacheType, Class<? extends Serializable> modelClazz){
+		if(null != cacheType && null != modelClazz){
+			String key = modelClazz.getName() + ":" + cacheType;
+			sql2oCache.hdel(key);
+		}
+	}
+	
+	/**
+	 * 刷新缓存
+	 */
+	public void cleanAll(){
+		
+		LOGGER.debug("更新缓存：" + model.getName() + " -> count,list,detail,sqlcount,sqllist,sqldetail");
+		sql2oCache.hdel(CACHE_KEY_COUNT);
+		sql2oCache.hdel(CACHE_KEY_LIST);
+		sql2oCache.hdel(CACHE_KEY_DETAIL);
+		
+		String countkey = model.getName() + ":" + CacheType.sqlcount.toString();
+		String listkey = model.getName() + ":" + CacheType.sqllist.toString();
+		String detailkey = model.getName() + ":" + CacheType.sqldetail.toString();
+		
+		sql2oCache.hdel(countkey);
+		sql2oCache.hdel(listkey);
+		sql2oCache.hdel(detailkey);
+	}
+	
+	/**
+	 * 刷新缓存
+	 */
+	public void cleanAll(Class<T> modelClazz){
+		
+		LOGGER.debug("更新缓存：" + modelClazz.getName() + " -> count,list,detail,sqlcount,sqllist,sqldetail");
+		
+		String countkey = modelClazz.getName() + ":" + CacheType.count.toString();
+		String listkey = modelClazz.getName() + ":" + CacheType.list.toString();
+		String detailkey = modelClazz.getName() + ":" + CacheType.detail.toString();
+		
+		String sqlcountkey = modelClazz.getName() + ":" + CacheType.sqlcount.toString();
+		String sqllistkey = modelClazz.getName() + ":" + CacheType.sqllist.toString();
+		String sqldetailkey = modelClazz.getName() + ":" + CacheType.sqldetail.toString();
+		
+		sql2oCache.hdel(countkey);
+		sql2oCache.hdel(listkey);
+		sql2oCache.hdel(detailkey);
+		
+		sql2oCache.hdel(sqlcountkey);
+		sql2oCache.hdel(sqllistkey);
+		sql2oCache.hdel(sqldetailkey);
+	}
+	
 	/**
      * @return		返回查询一个对象
      */
@@ -662,7 +743,9 @@ public class Model<T extends Serializable> {
     		if(isCache()){
     			field = EncrypKit.md5(getCacheKey(null));
     			
-    			res = sql2oCache.hgetV(CACHE_KEY_DETAIL, field);
+    			String key = (null == CACHE_KEY_SQL_DETAIL) ? CACHE_KEY_DETAIL : CACHE_KEY_SQL_DETAIL;
+    			
+    			res = sql2oCache.hgetV(key, field);
     			if(null != res){
     				return res;
     			}
@@ -689,11 +772,12 @@ public class Model<T extends Serializable> {
 				
 				// 重新放入缓存
 				if(isCache() && null != res){
-					sql2oCache.hsetV(CACHE_KEY_DETAIL, field, res);
+					String key = (null == CACHE_KEY_SQL_DETAIL) ? CACHE_KEY_DETAIL : CACHE_KEY_SQL_DETAIL;
+					sql2oCache.hsetV(key, field, res);
 				}
 				return res;
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -713,9 +797,9 @@ public class Model<T extends Serializable> {
     		String field = null;
     		// 启用缓存
     		if(isCache()){
-    			
     			field = EncrypKit.md5(getCacheKey(null));
-    			res = sql2oCache.hget(CACHE_KEY_DETAIL, field);
+    			String key = (null == CACHE_KEY_SQL_DETAIL) ? CACHE_KEY_DETAIL : CACHE_KEY_SQL_DETAIL;
+    			res = sql2oCache.hget(key, field);
     			if(null != res){
         			return res;
         		}
@@ -734,10 +818,11 @@ public class Model<T extends Serializable> {
 				res = (T) query.executeAndFetchFirst(this.model);
 				
 				if(isCache() && null != res){
-					sql2oCache.hset(CACHE_KEY_DETAIL, field, res);
+					String key = (null == CACHE_KEY_SQL_DETAIL) ? CACHE_KEY_DETAIL : CACHE_KEY_SQL_DETAIL;
+					sql2oCache.hset(key, field, res);
 				}
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -767,7 +852,7 @@ public class Model<T extends Serializable> {
 				
 				return (M) query.executeScalar();
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -790,7 +875,8 @@ public class Model<T extends Serializable> {
     		// 开启缓存
     		if(isCache()){
     			field = EncrypKit.md5(getCacheKey(null));
-    			result = (List<T>) sql2oCache.hgetlist(CACHE_KEY_LIST, field);
+    			String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+    			result = (List<T>) sql2oCache.hgetlist(key, field);
     			if(null != result){
     				return result;
     			}
@@ -815,11 +901,12 @@ public class Model<T extends Serializable> {
 				result = (List<T>) query.executeAndFetch(this.model);
 				
 				if(isCache() && null != result){
-					sql2oCache.hsetlist(CACHE_KEY_LIST, field, result);
+					String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+					sql2oCache.hsetlist(key, field, result);
 				}
 				return result;
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -842,7 +929,8 @@ public class Model<T extends Serializable> {
     		// 开启缓存
     		if(isCache()){
     			field = EncrypKit.md5(getCacheKey(null));
-    			result = sql2oCache.hgetlists(CACHE_KEY_LIST, field);
+    			String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+    			result = sql2oCache.hgetlists(key, field);
     			if(null != result){
     				return result;
     			}
@@ -867,11 +955,12 @@ public class Model<T extends Serializable> {
 				result = query.executeAndFetch(clazz);
 				
 				if(isCache() && null != result){
-					sql2oCache.hsetlists(CACHE_KEY_LIST, field, result);
+					String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+					sql2oCache.hsetlists(key, field, result);
 				}
 				return result;
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -894,7 +983,8 @@ public class Model<T extends Serializable> {
     		// 开启缓存
     		if(isCache()){
     			field = EncrypKit.md5(getCacheKey(null));
-    			result = sql2oCache.hgetlistmap(CACHE_KEY_LIST, field);
+    			String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+    			result = sql2oCache.hgetlistmap(key, field);
     			if(null != result){
     				return result;
     			}
@@ -919,12 +1009,13 @@ public class Model<T extends Serializable> {
 				result = query.executeAndFetchTable().asList();
 				
 				if(isCache() && null != result){
-					sql2oCache.hsetlistmap(CACHE_KEY_LIST, field, result);
+					String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+					sql2oCache.hsetlistmap(key, field, result);
 				}
 				
 				return result;
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -967,7 +1058,9 @@ public class Model<T extends Serializable> {
     			cacheSql = cacheSql.replaceAll("\\s", "");
     			field = EncrypKit.md5(cacheSql);
     			
-    			results = sql2oCache.hgetlist(CACHE_KEY_LIST, field);
+    			String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+    			
+    			results = sql2oCache.hgetlist(key, field);
     			
     			pageModel = new Page<T>(totalCount, page, pageSize);
         		
@@ -986,15 +1079,14 @@ public class Model<T extends Serializable> {
     		
     		sqlEnd += " limit :page, :pageSize";
     		
-    		condition.eq("page", page - 1);
-    		condition.eq("pageSize", pageSize);
-    		
     		Connection conn = null;
 			try {
 				// 设置query
 				conn = sql2o.open();
 				Query query = conn.createQuery(sqlEnd);
 				query = parseParams(query);
+				query.addParameter("page", page - 1);
+				query.addParameter("pageSize", pageSize);
 				
 				LOGGER.debug("execute sql：" + query.toString());
 				condition.printLog();
@@ -1003,14 +1095,15 @@ public class Model<T extends Serializable> {
 				if(null != results && results.size() > 0){
 					
 					if(isCache()){
-						sql2oCache.hsetlist(CACHE_KEY_LIST, field, results);
+						String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+						sql2oCache.hsetlist(key, field, results);
 					}
 					pageModel.setResults((List<T>) results);
 				}
 				
 				return pageModel;
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -1051,11 +1144,14 @@ public class Model<T extends Serializable> {
     		List<Map<String, Object>> results = null;
     		// 开启缓存
     		if(isCache()){
+    			
     			String cacheSql = getCacheKey(null) + "limit"+ (page - 1) +"," + pageSize;
     			cacheSql = cacheSql.replaceAll("\\s", "");
     			field = EncrypKit.md5(cacheSql);
     			
-    			results = sql2oCache.hgetlistmap(CACHE_KEY_LIST, field);
+    			String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+    			
+    			results = sql2oCache.hgetlistmap(key, field);
     			
         		if(null != results && results.size() > 0){
         			pageMap = new Page<Map<String, Object>>(totalCount, page, pageSize);
@@ -1073,14 +1169,16 @@ public class Model<T extends Serializable> {
     		
     		sqlEnd += " limit :page, :pageSize";
     		
-    		condition.eq("page", page - 1);
-    		condition.eq("pageSize", pageSize);
+//    		condition.eq("page", page - 1);
+//    		condition.eq("pageSize", pageSize);
     		Connection conn = null;
 			try {
 				// 设置query
 				conn = sql2o.open();
 				Query query = conn.createQuery(sqlEnd);
 				query = parseParams(query);
+				query.addParameter("page", page - 1);
+				query.addParameter("pageSize", pageSize);
 				
 				LOGGER.debug("execute sql：" + query.toString());
 				condition.printLog();
@@ -1091,13 +1189,14 @@ public class Model<T extends Serializable> {
 				
 				if(null != results && results.size() > 0){
 					if(isCache()){
-						sql2oCache.hsetlistmap(CACHE_KEY_LIST, field, results);
+						String key = (null == CACHE_KEY_SQL_LIST) ? CACHE_KEY_LIST : CACHE_KEY_SQL_LIST;
+						sql2oCache.hsetlistmap(key, field, results);
 					}
 					pageMap.setResults(results);
 				}
 				
 			} catch (Exception e) {
-				LOGGER.error(e);
+				e.printStackTrace();
 			} finally{
 				if(null != conn){
 					conn.close();
@@ -1127,7 +1226,7 @@ public class Model<T extends Serializable> {
      * 
      * @return	返回主键
      */
-    @SuppressWarnings({ "unchecked", "resource" })
+    @SuppressWarnings({ "unchecked"})
 	public <V> V executeAndCommit(Class<V> returnType) {
     	V key = null;
     	Query query = null;
@@ -1138,8 +1237,7 @@ public class Model<T extends Serializable> {
 				
 				if(isCache()){
 					LOGGER.debug("更新缓存：" + model.getName() + " -> count,list");
-					sql2oCache.hdel(CACHE_KEY_COUNT);
-					sql2oCache.hdel(CACHE_KEY_LIST);
+					cleanAll();
 				}
 				
 				if(null == query){
@@ -1160,8 +1258,7 @@ public class Model<T extends Serializable> {
 				
 				if(isCache()){
 					LOGGER.debug("更新缓存：" + model.getName() + " -> detail,list");
-					sql2oCache.hdel(CACHE_KEY_DETAIL);
-					sql2oCache.hdel(CACHE_KEY_LIST);
+					cleanAll();
 				}
 				
 				if(null == query){
@@ -1177,9 +1274,7 @@ public class Model<T extends Serializable> {
 				
 				if(isCache()){
 					LOGGER.debug("更新缓存：" + model.getName() + " -> count,list,detail");
-					sql2oCache.hdel(CACHE_KEY_COUNT);
-					sql2oCache.hdel(CACHE_KEY_LIST);
-					sql2oCache.hdel(CACHE_KEY_DETAIL);
+					cleanAll();
 				}
 				if(null == query){
 					LOGGER.error("query is null");
@@ -1192,10 +1287,13 @@ public class Model<T extends Serializable> {
 			condition.clearMap();
 			return key;
 		} catch (Exception e) {
-			LOGGER.error(e);
+			e.printStackTrace();
 		} finally{
 			if(null != query){
-				query.close();
+				Connection connection = query.getConnection();
+				if(null != connection){
+					connection.close();
+				}
 			}
 		}
     	return null;
@@ -1243,7 +1341,7 @@ public class Model<T extends Serializable> {
 				return query.getConnection();
 			}
 		} catch (Exception e) {
-			LOGGER.error(e);
+			e.printStackTrace();
 		}
     	return null;
     }

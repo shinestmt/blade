@@ -1,5 +1,23 @@
 # blade last version
 
+如果在maven仓库中下载不到最新版本的依赖，请添加maven snapshots仓库
+```xml
+<repositories>
+ <repository>
+   <id>oss-snapshots</id>
+   <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+   <releases>
+     <enabled>false</enabled>
+   </releases>
+   <snapshots>
+     <enabled>true</enabled>
+   </snapshots>
+ </repository>
+</repositories>
+```
+和`dependencies`相同级别
+
+
 ## [blade-kit](http://search.maven.org/#search%7Cga%7C1%7Cblade-kit)
 ```xml
 <dependency>
@@ -14,7 +32,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-core</artifactId>
-    <version>1.2.9-alpha</version>
+    <version>1.2.9</version>
 </dependency>
 ```
 ## [blade-sql2o](http://search.maven.org/#search%7Cga%7C1%7Cblade-sql2o)
@@ -22,7 +40,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-sql2o</artifactId>
-    <version>1.2.8-alpha</version>
+    <version>1.2.8</version>
 </dependency>
 ```
 
@@ -58,7 +76,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-cache</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
 </dependency>
 ```
 

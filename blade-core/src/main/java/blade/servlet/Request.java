@@ -87,12 +87,11 @@ public class Request {
      */
     public void initRequest(RouteMatcher match) {
     	
-        List<String> requestList = PathKit.convertRouteToList(match.getRequestURI());
+    	List<String> requestList = PathKit.convertRouteToList(match.getRequestURI());
         List<String> pathList = PathKit.convertRouteToList(match.getPath());
         
         this.pathParams = getPathParams(requestList, pathList);
         this.splat = getSplat(requestList, pathList);
-        
     }
 
     /**
@@ -523,7 +522,7 @@ public class Request {
         return servletRequest.getProtocol();
     }
     
-    protected static Map<String, String> getPathParams(List<String> request, List<String> matched) {
+protected static Map<String, String> getPathParams(List<String> request, List<String> matched) {
     	
         Map<String, String> params = CollectionKit.newHashMap();
 
