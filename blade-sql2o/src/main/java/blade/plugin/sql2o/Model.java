@@ -11,7 +11,8 @@ import org.sql2o.Connection;
 import org.sql2o.Query;
 import org.sql2o.Sql2o;
 
-import blade.Blade;
+import com.blade.Blade;
+
 import blade.kit.EncrypKit;
 import blade.kit.StringKit;
 import blade.kit.log.Logger;
@@ -31,17 +32,17 @@ public class Model<T extends Serializable> {
 	
 	private static final Logger LOGGER = Logger.getLogger(Model.class);
 	
-	/**
-	 * 缓存对象
-	 */
-    public Sql2oCache sql2oCache = Sql2oCacheFactory.getSql2oCache();
-    
     /**
      * sql2o对象，操作数据库
      */
     private Sql2o sql2o = DataSourceManager.me().getSql2o();
     
-    private static final Sql2oPlugin SQL2O_PLUGIN = Blade.plugin(Sql2oPlugin.class);
+    private static final Sql2oPlugin SQL2O_PLUGIN = Blade.me().plugin(Sql2oPlugin.class);
+    
+    /**
+	 * 缓存对象
+	 */
+    public Sql2oCache sql2oCache = SQL2O_PLUGIN.isOpenCache() ? Sql2oCacheFactory.getSql2oCache() : null;
     
     /**
      * 当前class实例

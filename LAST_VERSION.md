@@ -23,7 +23,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-kit</artifactId>
-    <version>1.2.7-alpha</version>
+    <version>1.2.7-beta</version>
 </dependency>
 ```
 
@@ -32,7 +32,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-core</artifactId>
-    <version>1.2.9</version>
+    <version>1.4.0-beta</version>
 </dependency>
 ```
 ## [blade-sql2o](http://search.maven.org/#search%7Cga%7C1%7Cblade-sql2o)
@@ -40,7 +40,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-sql2o</artifactId>
-    <version>1.2.8</version>
+    <version>1.2.9</version>
 </dependency>
 ```
 
@@ -49,7 +49,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-jetbrick</artifactId>
-    <version>1.2.4</version>
+    <version>1.2.6</version>
 </dependency>
 ```
 
@@ -58,7 +58,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-beetl</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
 </dependency>
 ```
 
@@ -67,7 +67,7 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-velocity</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
 </dependency>
 ```
 
@@ -85,6 +85,15 @@
 <dependency>
     <groupId>com.bladejava</groupId>
     <artifactId>blade-redis</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.3</version>
+</dependency>
+```
+
+## [blade-startup](http://search.maven.org/#search%7Cga%7C1%7Cblade-startup)
+```xml
+<dependency>
+    <groupId>com.bladejava</groupId>
+    <artifactId>blade-startup</artifactId>
+    <version>1.0.0</version>
 </dependency>
 ```

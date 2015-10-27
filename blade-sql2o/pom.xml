@@ -11,7 +11,7 @@
 
 	<artifactId>blade-sql2o</artifactId>
 	<packaging>jar</packaging>
-	<version>1.2.9-alpha</version>
+	<version>1.2.9</version>
 	<name>blade-sql2o</name>
 	<url>https://github.com/biezhi/blade/tree/master/blade-sql2o</url>
 
@@ -26,7 +26,7 @@
 			<groupId>com.bladejava</groupId>
 			<artifactId>blade-cache</artifactId>
 			<version>1.2.3</version>
-			<optional>true</optional>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.sql2o</groupId>
