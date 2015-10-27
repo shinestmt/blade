@@ -25,7 +25,6 @@
 		<dependency>
 			<groupId>com.bladejava</groupId>
 			<artifactId>blade-core</artifactId>
-			<version>${blade.version}</version>
 		</dependency>
 		
 		<dependency>

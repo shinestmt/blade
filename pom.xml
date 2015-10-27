@@ -30,17 +30,6 @@
 		<module>blade-redis</module>
     <module>blade-startup</module>
   </modules>
-		
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>${junit.version}</version>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 	
 	<repositories>
 	 <repository>
@@ -75,5 +64,55 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.bladejava</groupId>
+				<artifactId>blade-kit</artifactId>
+				<version>${blade.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.bladejava</groupId>
+				<artifactId>blade-core</artifactId>
+				<version>${blade.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.bladejava</groupId>
+				<artifactId>blade-cache</artifactId>
+				<version>${blade.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.bladejava</groupId>
+				<artifactId>blade-jetbrick</artifactId>
+				<version>${blade.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.bladejava</groupId>
+				<artifactId>blade-sql2o</artifactId>
+				<version>${blade.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.bladejava</groupId>
+				<artifactId>blade-velocity</artifactId>
+				<version>${blade.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.bladejava</groupId>
+				<artifactId>blade-beetl</artifactId>
+				<version>${blade.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.bladejava</groupId>
+				<artifactId>blade-redis</artifactId>
+				<version>${blade.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

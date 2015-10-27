@@ -12,7 +12,7 @@ import blade.cache.CacheManager;
 @SuppressWarnings("unchecked")
 public class SimpleSql2oCache implements Sql2oCache {
 
-	private CacheManager cm = CacheManager.me();
+	private CacheManager cm = CacheManager.getInstance();
 	
 	private static final String CACHE_ID = "sql2o_cache";
 	
@@ -109,13 +109,7 @@ public class SimpleSql2oCache implements Sql2oCache {
 
 	@Override
 	public void destroy() throws CacheException {
-		try {
-			CacheManager.me().destroy();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
+		CacheManager.getInstance().removeAll();
 	}
 
 }

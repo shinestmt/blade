@@ -4,8 +4,8 @@ import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
 
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+//import org.eclipse.jetty.server.Server;
+//import org.eclipse.jetty.servlet.ServletContextHandler;
 
 import com.blade.CoreFilter;
 
@@ -23,16 +23,16 @@ public class BladeServer {
 	
 	public void run(String contextPath) throws Exception{
 		
-		Server server = new Server(port);
-		
-	    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-	    context.setContextPath(contextPath);
-	    context.setResourceBase(System.getProperty("java.io.tmpdir"));
-	    context.addFilter(CoreFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
-        server.setHandler(context);
-        
-	    server.start();
-	    LOGGER.info("Blade Server Listen on 0.0.0.0:" + port);
-	    server.join();
+//		Server server = new Server(port);
+//		
+//	    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+//	    context.setContextPath(contextPath);
+//	    context.setResourceBase(System.getProperty("java.io.tmpdir"));
+//	    context.addFilter(CoreFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+//        server.setHandler(context);
+//        
+//	    server.start();
+//	    LOGGER.info("Blade Server Listen on 0.0.0.0:" + port);
+//	    server.join();
 	}
 }

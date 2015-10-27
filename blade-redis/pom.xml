@@ -11,16 +11,18 @@
 	
 	<artifactId>blade-redis</artifactId>
 	<packaging>jar</packaging>
-	<version>1.4.0-alpha</version>
+	<version>${blade.version}</version>
 	<name>blade-redis</name>
 	<url>https://github.com/biezhi/blade/blade-redis</url>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.bladejava</groupId>
+			<artifactId>blade-kit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.bladejava</groupId>
 			<artifactId>blade-core</artifactId>
-			<version>${blade.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>redis.clients</groupId>
