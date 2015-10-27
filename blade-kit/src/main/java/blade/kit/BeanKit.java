@@ -106,5 +106,4 @@ public class BeanKit {
 		return result;
 	}
 	
-	
 }

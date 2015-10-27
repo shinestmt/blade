@@ -7,12 +7,13 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import blade.Blade;
-import blade.cache.CacheException;
+import com.blade.Blade;
+import com.blade.plugin.Plugin;
+
 import blade.kit.PropertyKit;
 import blade.kit.StringKit;
+import blade.kit.base.ThrowableKit;
 import blade.kit.log.Logger;
-import blade.plugin.Plugin;
 import blade.plugin.sql2o.cache.Sql2oCache;
 import blade.plugin.sql2o.cache.Sql2oCacheFactory;
 import blade.plugin.sql2o.ds.DataSourceManager;
@@ -89,7 +90,7 @@ public class Sql2oPlugin implements Plugin {
 	 * @param dataSource 数据源对象
 	 */
 	public Sql2oPlugin config(DataSource dataSource){
-		String opencache = Blade.config().get("blade.db.opencache");
+		String opencache = Blade.me().config().get("blade.db.opencache");
 		if(StringKit.isNotBlank(opencache)){
 			isOpenCache = Boolean.valueOf(opencache);
 		}
@@ -103,18 +104,13 @@ public class Sql2oPlugin implements Plugin {
 	}
 	
 	/**
-	 * 设置数据库配置
-	 * 
-	 * @param url
+	 * 数据库配置
 	 * @param driver
+	 * @param url
 	 * @param user
 	 * @param pass
+	 * @return
 	 */
-	public Sql2oPlugin config(String url, String user, String pass){
-		
-		return config(null, url, user, pass);
-	}
-	
 	public Sql2oPlugin config(String driver, String url, String user, String pass){
 		if(null == dbConfig){
 			dbConfig = new DBConfig();
@@ -136,10 +132,12 @@ public class Sql2oPlugin implements Plugin {
 	
 	@Override
 	public void run() {
-		DataSourceManager.me().run();
-		DataSource dataSource = DataSourceManager.me().getDataSource();
-		if(null == dataSource){
+		DataSourceManager dm = DataSourceManager.me();
+		dm.run();
+		DataSource dataSource = dm.getDataSource();
+		if(null == dataSource && null == dm.getSql2o()){
 			LOGGER.error("blade sql2o config fail!");
+			System.exit(0);
 		} else {
 			LOGGER.debug("blade sql2o config success!");
 		}
@@ -161,10 +159,8 @@ public class Sql2oPlugin implements Plugin {
 				Sql2oCache sql2oCache = Sql2oCacheFactory.getSql2oCache();
 				sql2oCache.destroy();
 			}
-		} catch (CacheException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(ThrowableKit.getStackTraceAsString(e));
 		}
 		
 	}
